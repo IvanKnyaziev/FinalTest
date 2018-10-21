@@ -17,10 +17,6 @@ class CustomCallable(private val searchResult: SearchResult) : Callable<SearchRe
 
     @Throws(Exception::class)
     override fun call(): SearchResult? {
-//        val searchResult = SearchResult()
-//        searchResult.id = id
-//        searchResult.url = url
-//        searchResult.searchWord = searchWord
         searchResult.executionResultStatus = SearchResult.RUNNING_FLAG
         sendMessage(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
 

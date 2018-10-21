@@ -26,7 +26,7 @@ class CustomThreadPoolManager private constructor() {
     private val mExecutorService: ExecutorService
     private val mTaskQueue: BlockingQueue<Runnable>
     private val mRunningTaskList: MutableList<Future<*>>
-    private val linksQueue: BlockingQueue<String>
+    private val linksHashSet: HashSet<String>
 
     private var uiThreadCallbackWeakReference: WeakReference<UiThreadCallback>? = null
 
@@ -57,7 +57,7 @@ class CustomThreadPoolManager private constructor() {
     init {
         mTaskQueue = LinkedBlockingQueue()
         mRunningTaskList = ArrayList()
-        linksQueue = LinkedBlockingQueue()
+        linksHashSet = HashSet()
         mExecutorService = CustomThreadPoolExecutor(
                 NUMBER_OF_CORES * 2,
                 NUMBER_OF_CORES * 2,
@@ -75,10 +75,10 @@ class CustomThreadPoolManager private constructor() {
     fun cancelAllTasks() {
         synchronized(this) {
             mTaskQueue.clear()
-            linksQueue.clear()
+            linksHashSet.clear()
             counter.set(maxRequest)
             for (task in mRunningTaskList) {
-                if (!task.isDone) {
+                if (task != null && !task.isDone) {
                     task.cancel(true)
                 }
             }
@@ -108,8 +108,8 @@ class CustomThreadPoolManager private constructor() {
     fun addNewCallables(message: Message?) {
         if (message?.obj != null) {
             val (_, _, searchWord, _, linksSet) = message.obj as SearchResult
-            linksQueue.addAll(linksSet!!)
-            for (link in linksQueue) {
+            linksHashSet.addAll(linksSet!!)
+            for (link in linksHashSet) {
                 if (counter.get() < maxRequest) {
 
                     val searchResult = SearchResult()
