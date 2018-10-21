@@ -1,7 +1,7 @@
 package app.innwaze.tmgr.com.finaltest.pojo
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
-import java.util.HashSet
+import java.util.*
 
 @Parcelize
 data class SearchResult(var id: Long = 0,
@@ -12,10 +12,10 @@ data class SearchResult(var id: Long = 0,
                         var executionResultStatus: Int? = 0 ) : Parcelable {
 
     companion object {
-        var FINISHED_FLAG = 1
-        var ERROR_FLAG = 2
-        var CREATED_FLAG = 3
-        var RUNNING_FLAG = 4
+        const val CREATED_FLAG = 1
+        const val RUNNING_FLAG = 2
+        const val FINISHED_FLAG = 3
+        const val ERROR_FLAG = 4
     }
 
 }

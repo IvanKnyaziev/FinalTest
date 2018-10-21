@@ -2,25 +2,28 @@ package app.innwaze.tmgr.com.finaltest.ui
 
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.os.*
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import app.innwaze.tmgr.com.finaltest.BuildConfig
 import app.innwaze.tmgr.com.finaltest.R
 import app.innwaze.tmgr.com.finaltest.core.CustomCallable
 import app.innwaze.tmgr.com.finaltest.core.CustomThreadPoolManager
 import app.innwaze.tmgr.com.finaltest.core.UiThreadCallback
 import app.innwaze.tmgr.com.finaltest.databinding.ActivityMainBinding
+import app.innwaze.tmgr.com.finaltest.pojo.EnterValues
 import app.innwaze.tmgr.com.finaltest.pojo.SearchResult
 import app.innwaze.tmgr.com.finaltest.util.Util
 import app.innwaze.tmgr.com.finaltest.view.BaseActivity
-import java.lang.ref.WeakReference
-import android.support.v7.widget.DividerItemDecoration
-import android.widget.Button
-import app.innwaze.tmgr.com.finaltest.BuildConfig
-import app.innwaze.tmgr.com.finaltest.pojo.EnterValues
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.ref.WeakReference
 
 
 class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, MainActivityContract.View {
@@ -121,6 +124,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
         searchResult.url = binding.enterValues!!.url
         searchResult.searchWord = binding.enterValues!!.searchWord
         searchResult.executionResultStatus = SearchResult.CREATED_FLAG
+        adapter.add(searchResult)
         val callable = CustomCallable(searchResult)
         callable.setCustomThreadPoolManager(mCustomThreadPoolManager)
         mCustomThreadPoolManager.addCallable(callable)
@@ -186,7 +190,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
                             SearchResult.RUNNING_FLAG -> {
                                 if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.notifyItemChanged(mWeakRefRVAdapter.get()!!.getItemPosition(result) ,result)
                             }
-                            SearchResult.FINISHED_FLAG -> {
+                            SearchResult.FINISHED_FLAG, SearchResult.ERROR_FLAG -> {
                                 if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.notifyItemChanged(mWeakRefRVAdapter.get()!!.getItemPosition(result) ,result)
                                 if (mWeakRefProgressBar?.get() != null) setProgressAndColor(result)
                             }

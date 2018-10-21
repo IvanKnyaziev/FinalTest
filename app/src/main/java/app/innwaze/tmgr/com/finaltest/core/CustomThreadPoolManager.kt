@@ -4,20 +4,12 @@ package app.innwaze.tmgr.com.finaltest.core
 import android.os.Message
 import android.os.Process
 import android.util.Log
-
-import java.lang.ref.WeakReference
-import java.util.ArrayList
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadFactory
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
-
 import app.innwaze.tmgr.com.finaltest.pojo.SearchResult
 import app.innwaze.tmgr.com.finaltest.util.Util
+import java.lang.ref.WeakReference
+import java.util.*
+import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class CustomThreadPoolManager private constructor() {
     // Counter starts from 1 because first callable was created from Activity
@@ -78,7 +70,7 @@ class CustomThreadPoolManager private constructor() {
             linksQueue.clear()
             counter.set(maxRequest)
             for (task in mRunningTaskList) {
-                if (!task.isDone) {
+                if (task != null && !task.isDone) {
                     task.cancel(true)
                 }
             }
@@ -106,7 +98,10 @@ class CustomThreadPoolManager private constructor() {
     }
 
     fun addNewCallables(message: Message?) {
-        if (message?.obj != null) {
+        val searchResult = message?.obj as SearchResult
+        if (searchResult != null) {
+
+
             val (_, _, searchWord, _, linksSet) = message.obj as SearchResult
             linksQueue.addAll(linksSet!!)
             for (link in linksQueue) {
@@ -128,11 +123,12 @@ class CustomThreadPoolManager private constructor() {
                 } else
                     break
             }
+            searchResult.executionResultStatus = SearchResult.FINISHED_FLAG
             sendMessageToUI(message)
         }
     }
 
-    private fun sendMessageToUI(message: Message) {
+    fun sendMessageToUI(message: Message) {
         if (uiThreadCallbackWeakReference != null && uiThreadCallbackWeakReference!!.get() != null) {
             uiThreadCallbackWeakReference!!.get()!!.publishToUiThread(message)
         }

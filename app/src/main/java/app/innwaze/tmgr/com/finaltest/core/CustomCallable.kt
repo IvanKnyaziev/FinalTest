@@ -3,13 +3,13 @@ package app.innwaze.tmgr.com.finaltest.core
 import android.os.Message
 import android.util.Log
 import android.webkit.URLUtil
+import app.innwaze.tmgr.com.finaltest.pojo.SearchResult
+import app.innwaze.tmgr.com.finaltest.util.Util
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.lang.ref.WeakReference
-import java.util.HashSet
+import java.util.*
 import java.util.concurrent.Callable
-import app.innwaze.tmgr.com.finaltest.pojo.SearchResult
-import app.innwaze.tmgr.com.finaltest.util.Util
 
 class CustomCallable(private val searchResult: SearchResult) : Callable<SearchResult> {
 
@@ -17,14 +17,6 @@ class CustomCallable(private val searchResult: SearchResult) : Callable<SearchRe
 
     @Throws(Exception::class)
     override fun call(): SearchResult? {
-//        val searchResult = SearchResult()
-//        searchResult.id = id
-//        searchResult.url = url
-//        searchResult.searchWord = searchWord
-        searchResult.executionResultStatus = SearchResult.RUNNING_FLAG
-        sendMessage(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
-
-        var message: Message? = null
         val regex = StringBuilder()
                 .append("\\b")
                 .append(searchResult.searchWord)
@@ -35,6 +27,9 @@ class CustomCallable(private val searchResult: SearchResult) : Callable<SearchRe
             // check if thread is interrupted before lengthy operation
             if (Thread.interrupted()) throw InterruptedException()
 
+            searchResult.executionResultStatus = SearchResult.RUNNING_FLAG
+            mCustomThreadPoolManagerWeakReference.get()!!.sendMessageToUI(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
+
             val doc = Jsoup.connect(searchResult.url).get()
             val links = doc.select("a[href]")
             val wordMatches = doc.getElementsMatchingOwnText(regex)
@@ -42,10 +37,8 @@ class CustomCallable(private val searchResult: SearchResult) : Callable<SearchRe
 
             searchResult.matches = wordMatches.size
             searchResult.linksSet = getLinksSet(links, linksSet)
-            searchResult.executionResultStatus = SearchResult.FINISHED_FLAG
             sendMessage(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
         } catch (e: Exception) {
-
             searchResult.executionResultStatus = SearchResult.ERROR_FLAG
             sendMessage(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
 
