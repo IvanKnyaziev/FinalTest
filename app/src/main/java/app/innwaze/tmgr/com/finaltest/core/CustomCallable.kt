@@ -27,8 +27,9 @@ class CustomCallable(private val searchResult: SearchResult) : Callable<SearchRe
             // check if thread is interrupted before lengthy operation
             if (Thread.interrupted()) throw InterruptedException()
 
-            searchResult.executionResultStatus = SearchResult.RUNNING_FLAG
-            mCustomThreadPoolManagerWeakReference.get()!!.sendMessageToUI(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
+
+//            searchResult.executionResultStatus = SearchResult.RUNNING_FLAG
+//            mCustomThreadPoolManagerWeakReference.get()!!.sendMessageToUI(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
 
             val doc = Jsoup.connect(searchResult.url).get()
             val links = doc.select("a[href]")
