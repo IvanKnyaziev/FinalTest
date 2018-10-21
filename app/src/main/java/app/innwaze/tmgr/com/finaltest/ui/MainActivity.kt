@@ -42,10 +42,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
         super.onCreate(savedInstanceState)
         binding.enterValues = EnterValues()
         if (BuildConfig.DEBUG) {
-            binding.enterValues!!.url = "https://www.wikipedia.org/"
-            binding.enterValues!!.maxThreads = 4
-            binding.enterValues!!.searchWord = "Wikipedia"
-            binding.enterValues!!.maxUrls = 100
+            binding.enterValues!!.url = "https://www.reddit.com/"
+            binding.enterValues!!.maxThreads = 8
+            binding.enterValues!!.searchWord = "Reddit"
+            binding.enterValues!!.maxUrls = 500
         }
         presenter = MainActivityPresenter(this)
         adapter = ResultsRVAdapter()
@@ -186,7 +186,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
                             SearchResult.RUNNING_FLAG -> {
                                 if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.notifyItemChanged(mWeakRefRVAdapter.get()!!.getItemPosition(result) ,result)
                             }
-                            SearchResult.FINISHED_FLAG -> {
+                            SearchResult.FINISHED_FLAG, SearchResult.ERROR_FLAG -> {
                                 if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.notifyItemChanged(mWeakRefRVAdapter.get()!!.getItemPosition(result) ,result)
                                 if (mWeakRefProgressBar?.get() != null) setProgressAndColor(result)
                             }
