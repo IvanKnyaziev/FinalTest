@@ -11,20 +11,23 @@ import java.util.concurrent.Callable
 import app.innwaze.tmgr.com.finaltest.pojo.SearchResult
 import app.innwaze.tmgr.com.finaltest.util.Util
 
-class CustomCallable(private val id: Long, private val url: String, private val searchWord: String) : Callable<SearchResult> {
+class CustomCallable(private val searchResult: SearchResult) : Callable<SearchResult> {
 
     private lateinit var mCustomThreadPoolManagerWeakReference: WeakReference<CustomThreadPoolManager>
 
     @Throws(Exception::class)
     override fun call(): SearchResult? {
-        val searchResult = SearchResult()
-        searchResult.id = id
-        searchResult.url = url
-        searchResult.searchWord = searchWord
+//        val searchResult = SearchResult()
+//        searchResult.id = id
+//        searchResult.url = url
+//        searchResult.searchWord = searchWord
+        searchResult.executionResultStatus = SearchResult.RUNNING_FLAG
+        sendMessage(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
+
         var message: Message? = null
         val regex = StringBuilder()
                 .append("\\b")
-                .append(searchWord)
+                .append(searchResult.searchWord)
                 .append("\\b")
                 .toString()
 
@@ -32,7 +35,7 @@ class CustomCallable(private val id: Long, private val url: String, private val 
             // check if thread is interrupted before lengthy operation
             if (Thread.interrupted()) throw InterruptedException()
 
-            val doc = Jsoup.connect(url).get()
+            val doc = Jsoup.connect(searchResult.url).get()
             val links = doc.select("a[href]")
             val wordMatches = doc.getElementsMatchingOwnText(regex)
             val linksSet = HashSet<String>()
@@ -40,15 +43,13 @@ class CustomCallable(private val id: Long, private val url: String, private val 
             searchResult.matches = wordMatches.size
             searchResult.linksSet = getLinksSet(links, linksSet)
             searchResult.executionResultStatus = SearchResult.FINISHED_FLAG
-            message = Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult)
-            sendMessage(message)
+            sendMessage(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
         } catch (e: Exception) {
 
             searchResult.executionResultStatus = SearchResult.ERROR_FLAG
-            message = Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult)
-            sendMessage(message)
+            sendMessage(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
 
-            Log.e("Unconnected ", url)
+            Log.e("Unconnected ", searchResult.url)
             e.printStackTrace()
         }
         return null

@@ -116,9 +116,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
         clearDisplay()
         lockStartButton()
         mCustomThreadPoolManager.resetCounter()
-        val callable = CustomCallable(0,
-                binding.enterValues!!.url,
-                binding.enterValues!!.searchWord)
+        val searchResult = SearchResult()
+        searchResult.id = 0L
+        searchResult.url = binding.enterValues!!.url
+        searchResult.searchWord = binding.enterValues!!.searchWord
+        searchResult.executionResultStatus = SearchResult.CREATED_FLAG
+        val callable = CustomCallable(searchResult)
         callable.setCustomThreadPoolManager(mCustomThreadPoolManager)
         mCustomThreadPoolManager.addCallable(callable)
     }
@@ -176,8 +179,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
             when (msg.what) {
                 Util.MESSAGE_SEARCH_RESULT_ID -> {
                     val result = msg.obj as SearchResult
-                    if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.add(result)
-                    if (mWeakRefProgressBar?.get() != null) setProgressAndColor(result)
+                    when (result.executionResultStatus){
+                            SearchResult.CREATED_FLAG -> {
+                                if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.add(result)
+                            }
+                            SearchResult.RUNNING_FLAG -> {
+                                if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.notifyItemChanged(mWeakRefRVAdapter.get()!!.getItemPosition(result) ,result)
+                            }
+                            SearchResult.FINISHED_FLAG -> {
+                                if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.notifyItemChanged(mWeakRefRVAdapter.get()!!.getItemPosition(result) ,result)
+                                if (mWeakRefProgressBar?.get() != null) setProgressAndColor(result)
+                            }
+                    }
                 }
                 Util.MESSAGE_STOP_ID -> {
                     val bundle = msg.data

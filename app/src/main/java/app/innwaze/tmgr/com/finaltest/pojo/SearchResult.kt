@@ -14,6 +14,8 @@ data class SearchResult(var id: Long = 0,
     companion object {
         var FINISHED_FLAG = 1
         var ERROR_FLAG = 2
+        var CREATED_FLAG = 3
+        var RUNNING_FLAG = 4
     }
 
 }

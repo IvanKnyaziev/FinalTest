@@ -111,7 +111,16 @@ class CustomThreadPoolManager private constructor() {
             linksQueue.addAll(linksSet!!)
             for (link in linksQueue) {
                 if (counter.get() < maxRequest) {
-                    val callable = CustomCallable(counter.get().toLong(), link, searchWord!!)
+
+                    val searchResult = SearchResult()
+                    searchResult.id = counter.get().toLong()
+                    searchResult.url = link
+                    searchResult.searchWord = searchWord
+                    searchResult.executionResultStatus = SearchResult.CREATED_FLAG
+
+                    sendMessageToUI(Util.createMessage(Util.MESSAGE_SEARCH_RESULT_ID, searchResult))
+
+                    val callable = CustomCallable(searchResult)
                     Log.d("Link to parse", link)
                     callable.setCustomThreadPoolManager(this)
                     addCallable(callable)

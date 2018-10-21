@@ -27,6 +27,18 @@ class ResultsRVAdapter : BaseRVAdapter<SearchResult, ResultItemBinding, ResultsR
         return R.layout.result_item
     }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (!payloads.isEmpty()){
+            if (payloads[0] is SearchResult){
+                val searchResult = payloads[0] as SearchResult
+                holder.binding!!.tvSearchWord.text = holder.binding.root.context.resources.getString(R.string.matches_result, searchResult.searchWord, searchResult.matches)
+                setTextColor(holder.binding!!, searchResult)
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val binding = holder.binding
         val result = getItem(position)
@@ -35,10 +47,20 @@ class ResultsRVAdapter : BaseRVAdapter<SearchResult, ResultItemBinding, ResultsR
     }
 
     private fun setTextColor(binding: ResultItemBinding, result: SearchResult) {
-        if (result.executionResultStatus == SearchResult.FINISHED_FLAG)
-            binding.tvUrl.setTextColor(Color.GREEN)
-        else
-            binding.tvUrl.setTextColor(Color.RED)
+        when (result.executionResultStatus){
+            SearchResult.FINISHED_FLAG -> {
+                binding.tvUrl.setTextColor(Color.GREEN)
+            }
+            SearchResult.ERROR_FLAG ->{
+                binding.tvUrl.setTextColor(Color.RED)
+            }
+            SearchResult.CREATED_FLAG ->{
+                binding.tvUrl.setTextColor(Color.BLUE)
+            }
+            SearchResult.RUNNING_FLAG ->{
+                binding.tvUrl.setTextColor(Color.YELLOW)
+            }
+        }
     }
 
     inner class ViewHolder(itemView: View) : BaseViewHolder<ResultItemBinding>(itemView)
