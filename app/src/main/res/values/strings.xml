@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">FinalTest</string>
+    <string name="url_for_search">URL for Search</string>
+    <string name="url_text">URL:</string>
+    <string name="matches_result">Matches for \'%s\' : %2$d</string>
+    <string name="search">Search</string>
+    <string name="max_threads">Max Threads</string>
+    <string name="invalid_url_error_message">Invalid URL</string>
+    <string name="max_threads_error_message">At least one thread required</string>
+    <string name="search_error_message">Search word should not be empty</string>
+    <string name="max_urls_error_message">At least one url must be parsed</string>
+    <string name="pause">Pause</string>
+    <string name="offline">No Status</string>
+</resources>
