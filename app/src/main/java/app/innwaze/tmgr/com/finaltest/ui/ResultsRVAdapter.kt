@@ -32,7 +32,7 @@ class ResultsRVAdapter : BaseRVAdapter<SearchResult, ResultItemBinding, ResultsR
             if (payloads[0] is SearchResult){
                 val searchResult = payloads[0] as SearchResult
                 holder.binding!!.tvSearchWord.text = holder.binding.root.context.resources.getString(R.string.matches_result, searchResult.searchWord, searchResult.matches)
-                setTextColor(holder.binding!!, searchResult)
+                setTextColor(holder.binding, searchResult)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)

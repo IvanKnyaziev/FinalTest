@@ -27,16 +27,16 @@ class CustomThreadPoolManager private constructor() {
     }
 
     fun setCorePoolSize(corePoolSize: Int) {
-        if (corePoolSize > MAX_RECOMMENDED_THREAD_POOL_SIZE) {
-            (mExecutorService as CustomThreadPoolExecutor).corePoolSize = MAX_RECOMMENDED_THREAD_POOL_SIZE
+        if (corePoolSize > NUMBER_OF_CORES) {
+            (mExecutorService as CustomThreadPoolExecutor).corePoolSize = NUMBER_OF_CORES
         } else {
             (mExecutorService as CustomThreadPoolExecutor).corePoolSize = corePoolSize
         }
     }
 
     fun setMaximumPoolSize(maximumPoolSize: Int) {
-        if (maximumPoolSize > MAX_RECOMMENDED_THREAD_POOL_SIZE) {
-            (mExecutorService as CustomThreadPoolExecutor).maximumPoolSize = MAX_RECOMMENDED_THREAD_POOL_SIZE
+        if (maximumPoolSize > NUMBER_OF_CORES) {
+            (mExecutorService as CustomThreadPoolExecutor).maximumPoolSize = NUMBER_OF_CORES
         } else {
             (mExecutorService as CustomThreadPoolExecutor).maximumPoolSize = maximumPoolSize
         }
@@ -51,8 +51,8 @@ class CustomThreadPoolManager private constructor() {
         mRunningTaskList = ArrayList()
         linksQueue = LinkedBlockingQueue()
         mExecutorService = CustomThreadPoolExecutor(
-                NUMBER_OF_CORES * 2,
-                NUMBER_OF_CORES * 2,
+                NUMBER_OF_CORES,
+                NUMBER_OF_CORES,
                 KEEP_ALIVE_TIME,
                 KEEP_ALIVE_TIME_UNIT,
                 mTaskQueue,
@@ -100,13 +100,10 @@ class CustomThreadPoolManager private constructor() {
     fun addNewCallables(message: Message?) {
         val searchResult = message?.obj as SearchResult
         if (searchResult != null) {
-
-
             val (_, _, searchWord, _, linksSet) = message.obj as SearchResult
-            linksQueue.addAll(linksSet!!)
+            if (linksQueue.size < counter.get())linksQueue.addAll(linksSet!!)
             for (link in linksQueue) {
                 if (counter.get() < maxRequest) {
-
                     val searchResult = SearchResult()
                     searchResult.id = counter.get().toLong()
                     searchResult.url = link

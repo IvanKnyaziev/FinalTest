@@ -9,7 +9,8 @@ data class SearchResult(var id: Long = 0,
                         var searchWord: String? = null,
                         var matches: Int? = 0,
                         var linksSet: HashSet<String>? = HashSet(),
-                        var executionResultStatus: Int? = 0 ) : Parcelable {
+                        var executionResultStatus: Int? = 0,
+                        val customError: CustomError = CustomError()) : Parcelable {
 
     companion object {
         const val CREATED_FLAG = 1
