@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import app.innwaze.tmgr.com.finaltest.R
 import app.innwaze.tmgr.com.finaltest.databinding.ResultItemBinding
+import app.innwaze.tmgr.com.finaltest.pojo.CustomError
 import app.innwaze.tmgr.com.finaltest.pojo.SearchResult
 import app.innwaze.tmgr.com.finaltest.view.BaseRVAdapter
 import app.innwaze.tmgr.com.finaltest.view.BaseViewHolder
@@ -33,6 +34,7 @@ class ResultsRVAdapter : BaseRVAdapter<SearchResult, ResultItemBinding, ResultsR
                 val searchResult = payloads[0] as SearchResult
                 holder.binding!!.tvSearchWord.text = holder.binding.root.context.resources.getString(R.string.matches_result, searchResult.searchWord, searchResult.matches)
                 setTextColor(holder.binding, searchResult)
+                setError(holder.binding, searchResult)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -44,6 +46,22 @@ class ResultsRVAdapter : BaseRVAdapter<SearchResult, ResultItemBinding, ResultsR
         val result = getItem(position)
         binding!!.result = result
         setTextColor(binding, result)
+        setError(binding, result)
+    }
+
+    private fun setError(binding: ResultItemBinding, result: SearchResult){
+        val context = binding.root.context
+        if (result.customError.code == CustomError.EMPTY) {
+            binding.tvError.text = context.getString(R.string.no_info)
+            binding.tvError.setTextColor(Color.BLACK)
+        }
+        if (result.customError.code == CustomError.NO_ERROR) {
+            binding.tvError.text = context.getString(R.string.no_errors)
+            binding.tvError.setTextColor(Color.GREEN)
+        } else if (!result.customError.message.isEmpty()) {
+            binding.tvError.text = context.getString(R.string.item_error_message, result.customError.message, result.customError.code)
+            binding.tvError.setTextColor(Color.RED)
+        }
     }
 
     private fun setTextColor(binding: ResultItemBinding, result: SearchResult) {
