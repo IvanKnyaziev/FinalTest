@@ -12,7 +12,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
-import app.innwaze.tmgr.com.finaltest.BuildConfig
 import app.innwaze.tmgr.com.finaltest.R
 import app.innwaze.tmgr.com.finaltest.core.CustomCallable
 import app.innwaze.tmgr.com.finaltest.core.CustomThreadPoolManager
@@ -44,12 +43,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.enterValues = EnterValues()
-        if (BuildConfig.DEBUG) {
-            binding.enterValues!!.url = "https://www.wikipedia.org/"
-            binding.enterValues!!.maxThreads = 4
-            binding.enterValues!!.searchWord = "Wikipedia"
-            binding.enterValues!!.maxUrls = 100
-        }
+//        if (BuildConfig.DEBUG) {
+//            binding.enterValues!!.url = "https://www.wikipedia.org/"
+//            binding.enterValues!!.maxThreads = 4
+//            binding.enterValues!!.searchWord = "Wikipedia"
+//            binding.enterValues!!.maxUrls = 100
+//        }
         presenter = MainActivityPresenter(this)
         adapter = ResultsRVAdapter()
         binding.rvResults.layoutManager = LinearLayoutManager(this)
