@@ -64,7 +64,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
                 adapter,
                 binding.pbCounter,
                 binding.btnPauseResume,
-                binding.tvStatus)
+                binding.tvStatus,
+                binding.btnStart)
         mCustomThreadPoolManager = CustomThreadPoolManager.getsInstance()!!
         mCustomThreadPoolManager.setUiThreadCallback(this)
     }
@@ -131,7 +132,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
     }
 
     private fun lockStartButton() {
-        //binding.btnStart.isEnabled = false
+        binding.btnStart.isEnabled = false
+        binding.btnStart.setBackgroundColor(Color.GRAY)
     }
 
     private fun unlockStartButton() {
@@ -163,12 +165,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
         binding.edMaxUrls.error = ""
     }
 
-    private class UiHandler(looper: Looper, display: TextView, rvAdapter: ResultsRVAdapter, progressBar: ProgressBar, pauseResumeButton: Button, status: TextView) : Handler(looper) {
+    private class UiHandler(looper: Looper,
+                            display: TextView,
+                            rvAdapter: ResultsRVAdapter,
+                            progressBar: ProgressBar,
+                            pauseResumeButton: Button,
+                            status: TextView,
+                            startButton: Button) : Handler(looper) {
         private val mWeakRefProgressStatusDisplay: WeakReference<TextView>?
         private val mWeakRefStatusDisplay: WeakReference<TextView>?
         private val mWeakRefPauseResumeButton: WeakReference<Button>?
         private val mWeakRefRVAdapter: WeakReference<ResultsRVAdapter>?
         private val mWeakRefProgressBar: WeakReference<ProgressBar>?
+        private val mWeakRefStartButton: WeakReference<Button>?
 
         init {
             this.mWeakRefProgressStatusDisplay = WeakReference(display)
@@ -176,6 +185,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
             this.mWeakRefPauseResumeButton = WeakReference(pauseResumeButton)
             this.mWeakRefRVAdapter = WeakReference(rvAdapter)
             this.mWeakRefProgressBar = WeakReference(progressBar)
+            this.mWeakRefStartButton = WeakReference(startButton)
         }
 
         override fun handleMessage(msg: Message) {
@@ -192,7 +202,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
                             }
                             SearchResult.FINISHED_FLAG, SearchResult.ERROR_FLAG -> {
                                 if (mWeakRefRVAdapter?.get() != null) mWeakRefRVAdapter.get()!!.notifyItemChanged(mWeakRefRVAdapter.get()!!.getItemPosition(result) ,result)
-                                if (mWeakRefProgressBar?.get() != null) setProgressAndColor(result)
+                                if (mWeakRefProgressBar?.get() != null){
+                                    setProgressAndColor(result)
+                                    // no much time to do good workaround in blocking start button
+                                    if (mWeakRefStartButton?.get() != null) {
+                                        if (mWeakRefProgressBar.get()!!.progress == mWeakRefProgressBar.get()!!.max) {
+                                            mWeakRefStartButton.get()!!.isEnabled = true
+                                            mWeakRefStartButton.get()!!.setBackgroundColor(Color.parseColor("#008577"))
+                                        }
+                                    }
+                                }
                             }
                     }
                 }
