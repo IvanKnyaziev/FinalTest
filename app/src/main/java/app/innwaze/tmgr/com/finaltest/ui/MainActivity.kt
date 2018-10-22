@@ -106,6 +106,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
 
     fun cancelAllTasksInThreadPool(view: View) {
         mCustomThreadPoolManager.cancelAllTasks()
+        unlockStartButton()
     }
 
     private fun setupThreadPoolExecutor() {
@@ -137,6 +138,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), UiThreadCallback, Main
 
     private fun unlockStartButton() {
         binding.btnStart.isEnabled = true
+        binding.btnStart.setBackgroundColor(Color.parseColor("#008577"))
+
     }
 
     private fun setStatusTextRunning(){
